@@ -1,35 +1,17 @@
 package main
 
 import (
-	"encoding/base64"
 	"fmt"
-	"log"
-	"time"
+	"testing"
 
 	"github.com/snowplow/snowplow-golang-analytics-sdk/analytics"
+	"github.com/stretchr/testify/assert"
 )
 
-// The goal of this script is to grab a Base64 encoded Snowplow payload
-// decode it and parse its fields. Our focus here is on the derived_context (see sample derived_context.json)
-// and grab any variable we want from the map or json.
-//
-// Snowplow has an SDK that grabs the derived_contexts in a map GetSubsetMap, which we are using but we
-// need to parse it and get each of the variables so their easily used.
-// e.g. output["contexts_com_dbip_location_1"]["traits"]["connection_type"]
+var m_a_p map[string]interface{}
 
-// Problem: This script works for contexts_nl_basjes_yauaa_context_1 (see line 55) but doesn't work
-// for others because the data structure is different.
-
-// Ask: Create an elegant, fast way to get the individual contexts so their variables
-// can be used. output["contexts_nl_basjes_yauaa_context_1"]["agentClass"] and the appropriate tests
-// that shows the parser is working properly.
-// Feel free to rewrite this to something more efficient, the only requirement is that it is
-// written in Go and uses Snowplow SDK.
-
-func main() {
-
-	start := time.Now()
-
+// init setups common data used in tests and benchmarks (same main func in test.go)
+func init() {
 	// A Base64 Encoded TSV Snowplow Payload, which includes JSON in some columns
 	// We'll use Snowplow Analytics SDK to parse the parts we want.
 	// We are interested in the derived contexts ... see below
@@ -38,121 +20,100 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	// Using Snowplow Analytics GOlang SDK to parse the event
 	parsed, err := analytics.ParseEvent(tsv) // Where event is a valid TSV string Snowplow event.
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	// Using Snowplow GOlang SDK GetSubsetMap of derived contexts, the payload
 	// that we are interested in
-	m_a_p, err := parsed.GetSubsetMap("derived_contexts")
+	m_a_p, err = parsed.GetSubsetMap("derived_contexts")
 	if err != nil {
 		fmt.Println(err)
 	}
+}
 
-	// Getting the context at a time using maps
-	// contexts_nl_basjes_yauaa_context_1
-	// contexts_com_dbip_isp_1
-	//ctxName := "contexts_nl_basjes_yauaa_context_1"
-	ctxName := "contexts_com_dbip_isp_1"
+// original example
+func TestGetDerivedContextMap(t *testing.T) {
+	t.Parallel()
+	ctxName := "contexts_nl_basjes_yauaa_context_1"
 	derived_context := m_a_p[ctxName]
 	output := GetDerivedContextMap(ctxName, derived_context)
-
-	fmt.Println("Agent Class: " + output[ctxName]["agentClass"])
-
-	log.Printf("#################################")
-	elapsed := time.Since(start)
-	log.Printf("#### Function took %s ####", elapsed)
-	log.Printf("#################################")
-	fmt.Println("")
-
+	value := output[ctxName]["agentClass"]
+	assert.Equal(t, "Browser", value)
 }
 
-// Decodes the Base64 Encoded Payload from EventBridge
-
-func DecodeBase64Payload(payload string) (string, error) {
-	sDec, err := base64.StdEncoding.DecodeString(payload)
-	if err != nil {
-		log.Fatalf("Failed to decode Base64 %v", err)
-	}
-	return string(sDec), err
+func TestGetDerivedContextMapV2(t *testing.T) {
+	t.Parallel()
+	t.Run("contexts_nl_basjes_yauaa_context_1 agentClass", func(t *testing.T) {
+		ctxName := "contexts_nl_basjes_yauaa_context_1"
+		derived_context := m_a_p[ctxName]
+		output := GetDerivedContextMap2(ctxName, derived_context)
+		value := output[ctxName].Get("agentClass").String()
+		assert.Equal(t, "Browser", value)
+	})
+	t.Run("contexts_com_dbip_isp_1 traits/connection_type", func(t *testing.T) {
+		ctxName := "contexts_com_dbip_isp_1"
+		derived_context := m_a_p[ctxName]
+		output := GetDerivedContextMap2(ctxName, derived_context)
+		value := output[ctxName].Get("traits").Get("connection_type").String()
+		assert.Equal(t, "Corporate", value)
+	})
+	t.Run("contexts_com_dbip_isp_1 traits/autonomous_system_number", func(t *testing.T) {
+		ctxName := "contexts_com_dbip_isp_1"
+		derived_context := m_a_p[ctxName]
+		output := GetDerivedContextMap2(ctxName, derived_context)
+		value := output[ctxName].Get("traits").Get("autonomous_system_number").Float64()
+		assert.Equal(t, float64(20001), value)
+	})
+	t.Run("contexts_org_ietf_http_header_1[0] name", func(t *testing.T) {
+		ctxName := "contexts_org_ietf_http_header_1"
+		derived_context := m_a_p[ctxName]
+		output := GetDerivedContextMap2(ctxName, derived_context)
+		value := output[ctxName].At(0).Get("name").String()
+		assert.Equal(t, "Host", value)
+	})
+	t.Run("contexts_org_ietf_http_header_1[0] value", func(t *testing.T) {
+		ctxName := "contexts_org_ietf_http_header_1"
+		derived_context := m_a_p[ctxName]
+		output := GetDerivedContextMap2(ctxName, derived_context)
+		value := output[ctxName].At(0).Get("value").String()
+		assert.Equal(t, "sp.ted.com", value)
+	})
+	t.Run("contexts_org_ietf_http_header_1[3] value", func(t *testing.T) {
+		ctxName := "contexts_org_ietf_http_header_1"
+		derived_context := m_a_p[ctxName]
+		output := GetDerivedContextMap2(ctxName, derived_context)
+		value := output[ctxName].At(3).Get("value").String()
+		assert.Equal(t, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36", value)
+	})
 }
 
-// Given a context (schema name) and the corresponding context_map it
-// return another map with all the variables and values for
-// that context.
-
-func GetDerivedContextMap(context string, context_map interface{}) map[string]map[string]string {
-
-	data := make(map[string]map[string]string)
-	data[context] = map[string]string{}
-
-	if rec, ok := context_map.([]interface{}); ok {
-		for key, val := range rec {
-			_ = key
-			if x, ok := val.(map[string]interface{}); ok {
-				for key, val := range x {
-					data[context][key] = val.(string)
-				}
-			}
+func BenchmarkGetDerivedContextMap(b *testing.B) {
+	// not really a fair comparison, v1 "parses" the complete derived context, while v2 only access to the requested
+	// "path".
+	b.Run("contexts_nl_basjes_yauaa_context_1 v1", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			ctxName := "contexts_nl_basjes_yauaa_context_1"
+			derived_context := m_a_p[ctxName]
+			output := GetDerivedContextMap(ctxName, derived_context)
+			_ = output[ctxName]["agentClass"]
 		}
-	}
-
-	return data
-}
-
-// DerivedContextMap wraps an arbitrary derived context map, providing methods to access values "on-demand".
-type DerivedContextMap struct {
-	value interface{}
-}
-
-// At returns the element at the given index. The wrapped value should be a slice.
-func (dcm DerivedContextMap) At(index int) DerivedContextMap {
-	if slice, ok := dcm.value.([]interface{}); ok {
-		return DerivedContextMap{slice[index]}
-	}
-	return DerivedContextMap{nil}
-}
-
-// Get returns the given property. The wrapped value should be a map.
-func (dcm DerivedContextMap) Get(property string) DerivedContextMap {
-	if m, ok := dcm.value.(map[string]interface{}); ok {
-		return DerivedContextMap{m[property]}
-	}
-	return DerivedContextMap{nil}
-}
-
-// String returns the wrapped value as a string.
-func (dcm DerivedContextMap) String() string {
-	return dcm.value.(string)
-}
-
-// Float64 returns the wrapped value as a float64.
-func (dcm DerivedContextMap) Float64() float64 {
-	return dcm.value.(float64)
-}
-
-// Bool returns the wrapped value as a bool.
-func (dcm DerivedContextMap) Bool() bool {
-	return dcm.value.(bool)
-}
-
-// Value returns the wrapped value as-is (allowing the caller to make any type assertion).
-func (dcm DerivedContextMap) Value() interface{} {
-	return dcm.value
-}
-
-func GetDerivedContextMap2(context string, context_map interface{}) map[string]DerivedContextMap {
-	// if context_map contains only one element, set it as value to avoid one unnecessary
-	// call to At(0) in each field access.
-	if rec, ok := context_map.([]interface{}); ok && len(rec) == 1 {
-		return map[string]DerivedContextMap{
-			context: {rec[0]},
+	})
+	b.Run("contexts_nl_basjes_yauaa_context_1 v2", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			ctxName := "contexts_nl_basjes_yauaa_context_1"
+			derived_context := m_a_p[ctxName]
+			output := GetDerivedContextMap2(ctxName, derived_context)
+			_ = output[ctxName].Get("agentClass")
 		}
-	}
-	return map[string]DerivedContextMap{
-		context: {context_map},
-	}
+	})
+	b.Run("contexts_com_dbip_isp_1 v2 traits/connection_type", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			ctxName := "contexts_com_dbip_isp_1"
+			derived_context := m_a_p[ctxName]
+			output := GetDerivedContextMap2(ctxName, derived_context)
+			_ = output[ctxName].Get("traits").Get("connection_type").String()
+		}
+	})
 }
