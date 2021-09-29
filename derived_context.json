@@ -1,0 +1,185 @@
+{
+  "schema": "iglu:com.snowplowanalytics.snowplow/contexts/jsonschema/1-0-1",
+  "data": [
+    {
+      "schema": "iglu:com.snowplowanalytics.snowplow/ua_parser_context/jsonschema/1-0-0",
+      "data": {
+        "useragentFamily": "Chrome",
+        "useragentMajor": "92",
+        "useragentMinor": "0",
+        "useragentPatch": "4515",
+        "useragentVersion": "Chrome 92.0.4515",
+        "osFamily": "Mac OS X",
+        "osMajor": "10",
+        "osMinor": "15",
+        "osPatch": "7",
+        "osPatchMinor": null,
+        "osVersion": "Mac OS X 10.15.7",
+        "deviceFamily": "Other"
+      }
+    },
+    {
+      "schema": "iglu:nl.basjes/yauaa_context/jsonschema/1-0-2",
+      "data": {
+        "deviceBrand": "Apple",
+        "deviceName": "Apple Macintosh",
+        "operatingSystemVersionMajor": "10",
+        "layoutEngineNameVersion": "Blink 92.0",
+        "operatingSystemNameVersion": "Mac OS X 10.15.7",
+        "layoutEngineNameVersionMajor": "Blink 92",
+        "operatingSystemName": "Mac OS X",
+        "agentVersionMajor": "92",
+        "layoutEngineVersionMajor": "92",
+        "deviceClass": "Desktop",
+        "agentNameVersionMajor": "Chrome 92",
+        "operatingSystemNameVersionMajor": "Mac OS X 10",
+        "deviceCpuBits": "32",
+        "operatingSystemClass": "Desktop",
+        "layoutEngineName": "Blink",
+        "agentName": "Chrome",
+        "agentVersion": "92.0.4515.107",
+        "layoutEngineClass": "Browser",
+        "agentNameVersion": "Chrome 92.0.4515.107",
+        "operatingSystemVersion": "10.15.7",
+        "deviceCpu": "Intel",
+        "agentClass": "Browser",
+        "layoutEngineVersion": "92.0"
+      }
+    },
+    {
+      "schema": "iglu:org.ietf/http_header/jsonschema/1-0-0",
+      "data": {
+        "name": "Host",
+        "value": "sp.ted.com"
+      }
+    },
+    {
+      "schema": "iglu:org.ietf/http_header/jsonschema/1-0-0",
+      "data": {
+        "name": "Origin",
+        "value": "https://fresh-cow-37.loca.lt"
+      }
+    },
+    {
+      "schema": "iglu:org.ietf/http_header/jsonschema/1-0-0",
+      "data": {
+        "name": "Referer",
+        "value": "https://fresh-cow-37.loca.lt/"
+      }
+    },
+    {
+      "schema": "iglu:org.ietf/http_header/jsonschema/1-0-0",
+      "data": {
+        "name": "User-Agent",
+        "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36"
+      }
+    },
+    {
+      "schema": "iglu:org.ietf/http_header/jsonschema/1-0-0",
+      "data": {
+        "name": "X-Forwarded-For",
+        "value": "75.80.110.186"
+      }
+    },
+    {
+      "schema": "iglu:com.dbip/location/jsonschema/1-0-0",
+      "data": {
+        "city": {
+          "geoname_id": 5342353,
+          "names": {
+            "en": "Del Mar",
+            "fa": "دل مار، کالیفرنیا",
+            "ja": "デル・マー",
+            "zh-CN": "德尔马"
+          }
+        },
+        "continent": {
+          "code": "NA",
+          "geoname_id": 6255149,
+          "names": {
+            "de": "Nordamerika",
+            "en": "North America",
+            "es": "Norteamérica",
+            "fa": " امریکای شمالی",
+            "fr": "Amérique Du Nord",
+            "ja": "北アメリカ大陸",
+            "ko": "북아메리카",
+            "pt-BR": "América Do Norte",
+            "ru": "Северная Америка",
+            "zh-CN": "北美洲"
+          }
+        },
+        "country": {
+          "geoname_id": 6252001,
+          "is_in_european_union": false,
+          "iso_code": "US",
+          "names": {
+            "de": "Vereinigte Staaten von Amerika",
+            "en": "United States",
+            "es": "Estados Unidos de América (los)",
+            "fa": "ایالات متحدهٔ امریکا",
+            "fr": "États-Unis",
+            "ja": "アメリカ合衆国",
+            "ko": "미국",
+            "pt-BR": "Estados Unidos",
+            "ru": "США",
+            "zh-CN": "美国"
+          }
+        },
+        "location": {
+          "latitude": 32.9595,
+          "longitude": -117.265,
+          "time_zone": "America/Los_Angeles",
+          "weather_code": "USCA0288"
+        },
+        "postal": {
+          "code": "92014"
+        },
+        "subdivisions": [
+          {
+            "geoname_id": 5332921,
+            "iso_code": "CA",
+            "names": {
+              "de": "Kalifornien",
+              "en": "California",
+              "es": "California",
+              "fa": "کالیفرنیا",
+              "fr": "Californie",
+              "ja": "カリフォルニア州",
+              "ko": "캘리포니아 주",
+              "pt-BR": "Califórnia",
+              "ru": "Калифорния",
+              "zh-CN": "加利福尼亚州"
+            }
+          },
+          {
+            "geoname_id": 5391832,
+            "names": {
+              "en": "San Diego",
+              "es": "Condado de San Diego",
+              "fa": "شهرستان سن دیگو، کالیفرنیا",
+              "fr": "Comté de San Diego",
+              "ja": "サンディエゴ郡",
+              "ko": "샌디에이고 군",
+              "pt-BR": "Condado de San Diego",
+              "ru": "Сан-Диего",
+              "zh-CN": "圣迭戈县"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "schema": "iglu:com.dbip/isp/jsonschema/1-0-0",
+      "data": {
+        "traits": {
+          "autonomous_system_number": 20001,
+          "autonomous_system_organization": "Charter Communications Inc",
+          "connection_type": "Corporate",
+          "isp": "Charter Communications",
+          "organization": "Spectrum"
+        }
+      }
+    }
+  ]
+}
